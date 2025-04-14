@@ -17,8 +17,13 @@
   }
 }
 
+.bpmn-editor {
+  display: flex;
+}
+
 .diagram {
   height: 500px;
+  flex-grow: 1;
 
   &.implement {
   }
@@ -30,4 +35,9 @@
 textarea {
   width: 500px;
   font-family: monospace;
+}
+
+.sidebar {
+  width: 300px;
+  border: 1px solid fuchsia;
 }
