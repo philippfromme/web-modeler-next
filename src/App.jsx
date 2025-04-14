@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { throttle } from "lodash";
 
 import BpmnModeler from "bpmn-js/lib/Modeler";
 import "bpmn-js/dist/assets/diagram-js.css";
@@ -148,13 +150,29 @@ function BpmnEditor({ xml, onXMLChange, view }) {
 
   const [lastExportedXML, setLastExportedXML] = useState(null);
 
+  const onModelerChange = useCallback(async () => {
+    console.log("elements.changed, exporting XML");
+
+    const start = Date.now();
+
+    const { xml } = await modelerRef.current.saveXML({ format: true });
+
+    console.log("XML exported in", Date.now() - start, "ms");
+
+    setLastExportedXML(xml);
+
+    onXMLChange(xml);
+  }, [onXMLChange]);
+
+  const throttledOnModelerChange = useRef(throttle(onModelerChange, 1000));
+
   useEffect(() => {
     let modeler = modelerRef.current;
 
     if (!modeler) {
       modeler = modelerRef.current = new BpmnModeler({});
 
-      modeler.on("elements.changed", onModelerChange);
+      modeler.on("elements.changed", throttledOnModelerChange.current);
     }
 
     modeler.attachTo(modelerContainerRef.current);
@@ -163,22 +181,14 @@ function BpmnEditor({ xml, onXMLChange, view }) {
   useEffect(() => {
     if (modelerRef.current && xml) {
       if (xml !== lastExportedXML) {
-        console.log("XML changed");
+        console.log("XML changed, importing XML");
 
         modelerRef.current.importXML(xml);
       } else {
-        console.log("XML not changed");
+        console.log("XML not changed, not importing XML");
       }
     }
   }, [xml, lastExportedXML]);
-
-  const onModelerChange = async () => {
-    const { xml } = await modelerRef.current.saveXML({ format: true });
-
-    setLastExportedXML(xml);
-
-    onXMLChange(xml);
-  };
 
   return (
     <div
