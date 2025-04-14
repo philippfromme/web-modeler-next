@@ -1,0 +1,33 @@
+.page {
+  font-family: sans-serif;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+
+  ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+
+    li button.active {
+      background-color: fuchsia;
+    }
+  }
+}
+
+.diagram {
+  height: 500px;
+
+  &.implement {
+  }
+  &.design {
+    background: fuchsia;
+  }
+}
+
+textarea {
+  width: 500px;
+  font-family: monospace;
+}
