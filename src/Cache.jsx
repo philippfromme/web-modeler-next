@@ -4,17 +4,29 @@ const CacheContext = createContext();
 
 export const CacheProvider = ({ children }) => {
   const [cache, setCache] = useState(new Map());
+  const [subscribers, setSubscribers] = useState(new Set());
 
   const setCacheData = (key, value) => {
     setCache((prevCache) => new Map(prevCache.set(key, value)));
+
+    subscribers.forEach((callback) => callback(key, value));
   };
 
   const getCacheData = (key) => {
     return cache.get(key);
   };
 
+  const subscribe = (callback) => {
+    setSubscribers((prevSubscribers) => new Set(prevSubscribers.add(callback)));
+    return () => setSubscribers((prevSubscribers) => new Set([...prevSubscribers].filter((cb) => cb !== callback)));
+  };
+
+  const unsubscribe = (callback) => {
+    setSubscribers((prevSubscribers) => new Set([...prevSubscribers].filter((cb) => cb !== callback)));
+  };
+
   return (
-    <CacheContext.Provider value={{ cache, setCacheData, getCacheData }}>
+    <CacheContext.Provider value={{ cache, setCacheData, getCacheData, subscribe, unsubscribe }}>
       {children}
     </CacheContext.Provider>
   );

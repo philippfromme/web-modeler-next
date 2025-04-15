@@ -10,6 +10,8 @@ import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 import TabbedSidebar from './TabbedSidebar';
 import CommentsTab from "./features/comments/CommentsTab";
 
+import CommentsExtension from "./features/comments/bpmn-js-extensions/CommentsExtension";
+
 import { 
   VIEWS,
   IMPLEMENT_VIEWS,
@@ -17,7 +19,7 @@ import {
   LayoutProvider
 } from "./LayoutContext";
 
-import { CacheProvider } from "./Cache";
+import { CacheProvider, useCache } from "./Cache";
 
 import "./App.css";
 
@@ -140,7 +142,7 @@ function BpmnPage() {
         (view === VIEWS.DESIGN ||
           (view === VIEWS.IMPLEMENT &&
             implementView === IMPLEMENT_VIEWS.MODELER)) && (
-          <BpmnEditor xml={xml} onXMLChange={onXMLChange} view={view} additionalModules={[]} additionalConfig={{}} />
+          <BpmnEditor xml={xml} onXMLChange={onXMLChange} view={view} additionalModules={[CommentsExtension]} additionalConfig={{}} />
         )}
       {xml &&
         view === VIEWS.IMPLEMENT &&
@@ -174,13 +176,16 @@ function BpmnEditor({ xml, onXMLChange, view, additionalModules = [], additional
 
   const throttledOnModelerChange = useRef(throttle(onModelerChange, 1000));
 
+  const cache = useCache();
+
   useEffect(() => {
     let modeler = modelerRef.current;
 
     if (!modeler) {
       modeler = modelerRef.current = new BpmnModeler({
         additionalModules,
-        ...additionalConfig
+        ...additionalConfig,
+        cache
       });
 
       modeler.on("elements.changed", throttledOnModelerChange.current);

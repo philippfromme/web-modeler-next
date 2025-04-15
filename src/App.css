@@ -41,3 +41,14 @@ textarea {
   width: 300px;
   border: 1px solid fuchsia;
 }
+
+.comments {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background-color: fuchsia;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
