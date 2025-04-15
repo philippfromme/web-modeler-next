@@ -1,12 +1,40 @@
-# React + Vite
+# Web Modeler Next
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This prototype solves some of the current Web Modeler issues in a way similar to Desktop Modeler without using MobX.
 
-Currently, two official plugins are available:
+## What problems does MobX solve in Web Modeler?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Persisting modeler and other state independent of component lifecycle
+2. Access to shared state from React components and bpmn-js extensions
+3. Automatic rerender on shared state update
 
-## Expanding the ESLint configuration
+All of these issues can be solved without MobX:
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 1. Persisting modeler and other state independent of component lifecycle
+
+* simple caching feature for persisting modeler and other state
+* can be replaced by MobX to make `subscribe` obsolete
+
+### 2. Access to shared state from React components and bpmn-js extensions
+
+* React components access cache through hooks
+* bpmn-js extensions access cache directly
+
+### 3. Automatic rerender on shared state update
+
+* `subscribe` to explicitly rerender on shared state update
+
+## Additional problems solved by this prototype:
+
+### 1. Single source of truth for XML
+
+* all views share the same XML
+
+### 2. No unwanted imports or exports
+
+* BPMN editor remembers last XML to prevent unwanted imports and exports
+* exports are throttled
+
+## Demo
+
+![](demo.gif)

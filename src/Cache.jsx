@@ -1,28 +1,33 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const CacheContext = createContext();
 
 export const CacheProvider = ({ children }) => {
-  const [cache, setCache] = useState(new Map());
-  const [subscribers, setSubscribers] = useState(new Set());
+  const cache = useRef(new Map());
+  const subscribers = useRef(new Set());
 
   const setCacheData = (key, value) => {
-    setCache((prevCache) => new Map(prevCache.set(key, value)));
+    cache.current.set(key, value);
 
-    subscribers.forEach((callback) => callback(key, value));
+    // console.log('setting cache', key, value);
+
+    subscribers.current.forEach((callback) => callback(key, value));
   };
 
   const getCacheData = (key) => {
-    return cache.get(key);
+    // console.log('getting cache', key, cache.current.get(key));
+
+    return cache.current.get(key);
   };
 
   const subscribe = (callback) => {
-    setSubscribers((prevSubscribers) => new Set(prevSubscribers.add(callback)));
-    return () => setSubscribers((prevSubscribers) => new Set([...prevSubscribers].filter((cb) => cb !== callback)));
+    subscribers.current.add(callback);
+
+    return () => unsubscribe(callback);
   };
 
   const unsubscribe = (callback) => {
-    setSubscribers((prevSubscribers) => new Set([...prevSubscribers].filter((cb) => cb !== callback)));
+    subscribers.current.delete(callback);
   };
 
   return (
@@ -44,13 +49,13 @@ export const useCache = () => {
 export const useFetchWithCache = (key, fetchFunction) => {
   const { getCacheData, setCacheData } = useCache();
 
-  const [data, setData] = React.useState(getCacheData(key));
+  const [data, setData] = useState(getCacheData(key));
 
-  const [isLoading, setIsLoading] = React.useState(!data);
+  const [isLoading, setIsLoading] = useState(!data);
 
-  const [error, setError] = React.useState(null);
+  const [error, setError] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!data) {
       setIsLoading(true);
 

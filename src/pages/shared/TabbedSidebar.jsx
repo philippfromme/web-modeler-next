@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 
 import { set } from "lodash";
 
-import { LayoutContext } from "./LayoutContext"
+import { LayoutContext } from "../../LayoutContext";
 
 export default function Sidebar({ children }) {
   const { getLayout, setLayout } = useContext(LayoutContext);
